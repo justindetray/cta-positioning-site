@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CTA Positioning Dashboard</title>
+    <meta
+      name="description"
+      content="Dashboard for CTA positioning estimates across futures using Databento continuous daily futures data."
+    />
+    <meta property="og:title" content="CTA Positioning Dashboard" />
+    <meta
+      property="og:description"
+      content="Systematic futures positioning monitor with current signals, changes, trigger levels, and history."
+    />
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=jet-brains-mono@400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to dashboard</a>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Dashboard controls">
+        <div class="brand">
+          <svg aria-label="CTA lens logo" class="brand-mark" viewBox="0 0 48 48" fill="none">
+            <path d="M8 24C8 12.954 16.954 4 28 4h12v12c0 11.046-8.954 20-20 20H8V24Z" stroke="currentColor" stroke-width="3" />
+            <path d="M14 24c0-6.627 5.373-12 12-12h6v6c0 6.627-5.373 12-12 12h-6v-6Z" fill="currentColor" />
+            <path d="M30 34l8 8" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+          </svg>
+          <div>
+            <p class="eyebrow">Futures positioning</p>
+            <h1>CTA Lens</h1>
+          </div>
+        </div>
+
+        <section class="control-group" aria-labelledby="asset-filter-title">
+          <h2 id="asset-filter-title">Asset filter</h2>
+          <div class="filter-list" id="assetFilters"></div>
+        </section>
+
+        <section class="control-group" aria-labelledby="instrument-title">
+          <h2 id="instrument-title">Instrument</h2>
+          <select id="instrumentSelect" aria-label="Select instrument"></select>
+        </section>
+
+        <section class="control-group meta-card" aria-labelledby="method-title">
+          <h2 id="method-title">Method</h2>
+          <dl>
+            <div>
+              <dt>Feed</dt>
+              <dd id="feedMeta">Loading</dd>
+            </div>
+            <div>
+              <dt>Roll</dt>
+              <dd id="rollMeta">Loading</dd>
+            </div>
+            <div>
+              <dt>Latest</dt>
+              <dd id="latestMeta">Loading</dd>
+            </div>
+          </dl>
+        </section>
+      </aside>
+
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Databento GLBX.MDP3 · Daily continuous futures</p>
+          <h2>CTA positioning dashboard</h2>
+        </div>
+        <div class="top-actions">
+          <button class="ghost-button" id="exportCsv" type="button">Export CSV</button>
+          <button class="icon-button" type="button" data-theme-toggle aria-label="Switch theme">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <main id="main" class="main" tabindex="-1">
+        <section class="kpi-grid" aria-label="Summary metrics">
+          <article class="kpi-card accent">
+            <p class="kpi-label">Net CTA position</p>
+            <strong id="netPosition">--</strong>
+            <span id="netPositionSub">Across visible universe</span>
+          </article>
+          <article class="kpi-card">
+            <p class="kpi-label">Largest long</p>
+            <strong id="largestLong">--</strong>
+            <span id="largestLongSub">--</span>
+          </article>
+          <article class="kpi-card">
+            <p class="kpi-label">Largest short</p>
+            <strong id="largestShort">--</strong>
+            <span id="largestShortSub">--</span>
+          </article>
+          <article class="kpi-card">
+            <p class="kpi-label">Biggest 1M shift</p>
+            <strong id="largestShift">--</strong>
+            <span id="largestShiftSub">--</span>
+          </article>
+        </section>
+
+        <section class="panel overview-panel" aria-labelledby="overview-title">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Cross-asset view</p>
+              <h2 id="overview-title">Positioning map</h2>
+            </div>
+            <div class="legend" aria-label="Heat map legend">
+              <span><i class="dot short"></i>Short</span>
+              <span><i class="dot neutral"></i>Neutral</span>
+              <span><i class="dot long"></i>Long</span>
+            </div>
+          </div>
+          <div id="positionMap" class="position-map"></div>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="panel chart-panel" aria-labelledby="chart-title">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow" id="selectedAssetClass">Instrument history</p>
+                <h2 id="chart-title">Price and CTA signal</h2>
+              </div>
+              <div class="chart-status">
+                <div class="instrument-stat" id="selectedPosition">--</div>
+                <div class="regime-chips" id="regimeChips" aria-label="CTA regime labels"></div>
+              </div>
+            </div>
+            <div class="chart-legend" aria-label="CTA signal legend">
+              <span><i class="dot long"></i>Net long exposure</span>
+              <span><i class="dot short"></i>Net short exposure</span>
+              <span><i class="dot neutral"></i>Zero line</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="historyChart" width="1100" height="520" aria-label="Price and CTA position history"></canvas>
+            </div>
+          </article>
+
+          <article class="panel" aria-labelledby="asset-summary-title">
+            <div class="panel-heading compact">
+              <h2 id="asset-summary-title">Asset summary</h2>
+            </div>
+            <div id="assetSummary" class="asset-summary"></div>
+          </article>
+        </section>
+
+        <section class="panel" aria-labelledby="table-title">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Detail table</p>
+              <h2 id="table-title">Latest tracker</h2>
+            </div>
+            <div class="table-note">Percentiles are within rolling windows</div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Asset</th>
+                  <th class="num">Close</th>
+                  <th class="num">CTA %</th>
+                  <th class="num">1M Δ</th>
+                  <th class="num">1Y pctile</th>
+                  <th class="num">3M z</th>
+                  <th class="num">Buy trigger</th>
+                  <th class="num">Sell trigger</th>
+                </tr>
+              </thead>
+              <tbody id="trackerTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="app.js" defer></script>
+  </body>
+</html>
