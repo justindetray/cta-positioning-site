@@ -1,7 +1,6 @@
-# CTA Positioning Dashboard
+# CTA Dashboard
 
-Static GitHub Pages site for the CTA Positioning Tracker.
+Static dashboard template for the CTA Positioning Tracker.
 
-Published URL: https://justindetray.github.io/cta-positioning-site/
-
-This repo stores the rendered dashboard and latest `assets/dashboard-data.json`. Signal logic and refresh scripts live in the private `cta-tracker-sandbox` repository.
+The daily refresh script writes `assets/dashboard-data.json` here via `dashboard_export.py`.
+Deploy this directory as a static site with `index.html` as the entry point.
